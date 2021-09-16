@@ -172,4 +172,5 @@ ENV/
 /research
 
 *.c
+pytdx/parser/xdxr/
 .pytest_cache/

@@ -1,10 +1,13 @@
 # coding=utf-8
 
+import pandas as pd
+from pandas.core.frame import DataFrame
 from pytdx.parser.base import BaseParser
 from pytdx.helper import get_datetime, get_volume, get_price, get_time
 from collections import OrderedDict
 import struct
 import six
+import os
 """
 need to fix
 
@@ -154,16 +157,22 @@ class GetXdXrInfo(BaseParser):
 
 if __name__ == '__main__':
 
-    from pytdx.util.best_ip import select_best_ip
+    #from pytdx.util.best_ip import select_best_ip
     from pytdx.hq import TdxHq_API
     api = TdxHq_API()
-    with api.connect():
-        # 11 扩缩股
-        print(api.to_df(api.get_xdxr_info(1, '600381')))
-        # 12 非流通股缩股
-        #print(api.to_df(api.get_xdxr_info(1, '600339')))
-        # 13 送认购权证
-        #print(api.to_df(api.get_xdxr_info(1, '600008')))
-        # 14 送认沽权证
-        #print(api.to_df(api.get_xdxr_info(0, '000932')))
+    directory = "xdxr"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    with api.connect("119.147.212.81", 7709):
+        slist = pd.read_csv("security_list.csv", dtype=str)
+        stockprefix = ["00", "200", "300", "60", "688", "900"]
+        for index, row in slist.iterrows():
+            for prefix in stockprefix:
+                if type(row['code']) == str and row["code"].startswith(prefix):
+                    print(row['code']) # 输出每行的索引值
+                    market = 0
+                    if prefix == "60" or prefix == "688" or prefix == "900":
+                        market = 1
+                    df = api.to_df(api.get_xdxr_info(market, row['code']))
+                    df.to_csv("xdxr/xdxr."+row['code']+".csv")
 

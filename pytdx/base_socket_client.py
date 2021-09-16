@@ -152,7 +152,7 @@ class BaseSocketClient(object):
         # 是否在函数调用出错的时候抛出异常
         self.raise_exception = raise_exception
 
-    def connect(self, ip='101.227.73.20', port=7709, time_out=CONNECT_TIMEOUT, bindport=None, bindip='0.0.0.0'):
+    def connect(self, ip='119.147.164.60', port=7709, time_out=CONNECT_TIMEOUT, bindport=None, bindip='0.0.0.0'):
         """
 
         :param ip:  服务器ip 地址

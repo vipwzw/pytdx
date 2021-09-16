@@ -1,5 +1,6 @@
 # coding=utf-8
 
+from pandas.core.frame import DataFrame
 from pytdx.parser.base import BaseParser
 from pytdx.helper import get_datetime, get_volume, get_price
 from collections import OrderedDict
@@ -50,3 +51,35 @@ class GetSecurityList(BaseParser):
 
 
         return stocks
+
+if __name__ == '__main__':
+
+    #from pytdx.util.best_ip import select_best_ip
+    from pytdx.hq import TdxHq_API
+    api = TdxHq_API()
+    with api.connect("119.147.212.81", 7709):
+        # 11 扩缩股
+        start = 0
+        limit = 1000
+        datalist = DataFrame()
+        market = 0
+        while True:
+            df = api.to_df(api.get_security_list(market, start))
+            if datalist.shape[0] == 0 and df.shape[0] > 1:
+                datalist = df
+            else:
+                datalist = datalist.append(df)
+            start += limit
+            print(df.shape[0])
+            if df.shape[0] < 1000:
+                break
+        market = 1
+        start = 0
+        while True:
+            df = api.to_df(api.get_security_list(market, start))
+            datalist = datalist.append(df)
+            start += limit
+            print(df.shape[0])
+            if df.shape[0] < 1000:
+                break
+        datalist.to_csv("security_list.csv",  index=False)
